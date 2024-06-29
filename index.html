@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Todo List App</title>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const TodoApp = () => {
+      const [todos, setTodos] = React.useState([
+        { id: 1, text: "Learn React", completed: false },
+        { id: 2, text: "Build a Todo App", completed: false },
+        { id: 3, text: "Deploy to Production", completed: false },
+      ]);
+      
+      const [newTodo, setNewTodo] = React.useState("");
+      const [filter, setFilter] = React.useState("all"); // Possible values: "all", "active", "completed"
+
+      const handleInputChange = (e) => {
+        setNewTodo(e.target.value);
+      };
+
+      const addTodo = () => {
+        if (newTodo.trim() === "") return;
+        const newTodoItem = {
+          id: todos.length + 1,
+          text: newTodo,
+          completed: false,
+        };
+        setTodos([...todos, newTodoItem]);
+        setNewTodo("");
+      };
+
+      const toggleTodoCompletion = (id) => {
+        const updatedTodos = todos.map((todo) =>
+          todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        );
+        setTodos(updatedTodos);
+      };
+
+      const removeTodo = (id) => {
+        const updatedTodos = todos.filter((todo) => todo.id !== id);
+        setTodos(updatedTodos);
+      };
+
+      const clearCompletedTodos = () => {
+        const updatedTodos = todos.filter((todo) => !todo.completed);
+        setTodos(updatedTodos);
+      };
+
+      const filteredTodos = todos.filter((todo) => {
+        if (filter === "all") return true;
+        if (filter === "active") return !todo.completed;
+        if (filter === "completed") return todo.completed;
+        return true;
+      });
+
+      return (
+        <div>
+          <h1>Todo List</h1>
+          <input
+            type="text"
+            value={newTodo}
+            onChange={handleInputChange}
+            placeholder="Enter a new todo"
+          />
+          <button onClick={addTodo}>Add Todo</button>
+          <ul>
+            {filteredTodos.map((todo) => (
+              <li key={todo.id}>
+                <input
+                  type="checkbox"
+                  checked={todo.completed}
+                  onChange={() => toggleTodoCompletion(todo.id)}
+                />
+                <span style={{ textDecoration: todo.completed ? "line-through" : "none" }}>{todo.text}</span>
+                <button onClick={() => removeTodo(todo.id)}>Remove</button>
+              </li>
+            ))}
+          </ul>
+          <div>
+            <button onClick={() => setFilter("all")}>All</button>
+            <button onClick={() => setFilter("active")}>Active</button>
+            <button onClick={() => setFilter("completed")}>Completed</button>
+            <button onClick={clearCompletedTodos}>Clear Completed</button>
+          </div>
+        </div>
+      );
+    };
+
+    // Render the TodoApp component into the root div
+    const rootElement = document.getElementById("root");
+    ReactDOM.render(<TodoApp />, rootElement);
+  </script>
+</body>
+</html>
